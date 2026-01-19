@@ -4,7 +4,7 @@ from langchain_openai import OpenAI
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key="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",
+  api_key="sk-sdsdsdsdd",
 )
 
 load_dotenv()
