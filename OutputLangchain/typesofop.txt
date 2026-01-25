@@ -1,0 +1,26 @@
+2 types of op
+structured and unstructured
+
+in structured op , op is json
+
+there are 2 types of llm in strructured op
+
+some give structure op by defualt like open AI we use method with_structured_op
+
+
+models wich cant are gemini clude
+
+what is op parser 
+they help to convert llm response in structured format like json,csv
+
+type of op parser
+
+string op parser
+json op parser
+structred op parser
+pydantic op parser
+
+
+Json output parser donot enforce a schema, it just ensures that the output is valid JSON. If you want to enforce a specific schema, you can use structredOutputParser instead of JsonOutputParser.
+
+Structuredout stiil cant do data validation so to fix it we use pydanticparser
