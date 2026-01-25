@@ -2,6 +2,10 @@ from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from typing import TypedDict,Annotated
 from dotenv import load_dotenv
 import os
+from pydantic import BaseModel,Field
+from typing import Optional
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
 
 load_dotenv()
 
@@ -15,16 +19,28 @@ llm = HuggingFaceEndpoint(
 
 model=ChatHuggingFace(llm=llm)
 
-class ReviewRequest(TypedDict):
-    key_themes: Annotated[list[str], "Key themes discussed in the review"]
-    review_text: Annotated[str, "The text of the review provided by the user"]
-    sentiment: Annotated[str, "The sentiment of the review, either 'positive' or 'negative'"]
-    pros: Annotated[list[str], "List of pros mentioned in the review"]
-    cons: Annotated[str, "List of cons mentioned in the review"]
+class ReviewRequest(BaseModel):
+    key_themes: list[str] = Field (description="Key themes discussed in the review")    
+    review_text: str = Field (description="The text of the review provided by the user")
+    sentiment: str = Field (description="The sentiment of the review, either 'positive' or 'negative'")
+    props: Optional[list[str]] = Field (default=None,description="List of pros mentioned in the review")
+    cons: Optional[list[str]] = Field (default=None,description="List of cons mentioned in the review")
 
-structured_model=model.with_structured_output(ReviewRequest)
+    
+# 3. SETUP PARSER & PROMPT
+# This parser creates the instructions for the model
+parser = JsonOutputParser(pydantic_object=ReviewRequest)
 
-result=structured_model.invoke("""iPhone 17 Review: The "Pro" Gap Has Finally Vanished Tested January 2026 | Price: $799
+# We inject format_instructions into the prompt
+prompt = PromptTemplate(
+    template="Extract the desired information from the review below.\n{format_instructions}\n\nReview:\n{query}\n",
+    input_variables=["query"],
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
+
+# 4. CREATE CHAIN
+chain = prompt | model | parser
+result=chain.invoke("""iPhone 17 Review: The "Pro" Gap Has Finally Vanished Tested January 2026 | Price: $799
 
 The Verdict: 4.5 / 5
 For the first time in years, the standard iPhone is the one most people should buy. By finally bringing 120Hz ProMotion and a 48MP ultra-wide camera to the base model, Apple has made the "Pro" upgrade harder to justify than ever before.
@@ -76,12 +92,17 @@ The A19 chip (built on the N3P process) is overkill for 99% of users. Benchmark 
 The "Air" Elephant in the Room
 We have to talk about the lineup. The iPhone 17 sits alongside the new ultra-slim iPhone 17 Air. While the Air turns heads with its 5mm thickness, the standard iPhone 17 destroys it in battery life and thermal performance. Unless you strictly prioritize style over substance, the standard 17 is the better phone.""")
 
-# print(result)
+print(result)
+# print("Review Text:", result['review_text'])
+# print("Sentiment:", result['sentiment'])
+# print("Key Themes:", result['key_themes'])
+# print("Pros:", result['pros'])
+# print("Cons:", result['cons'])   
+
+# CORRECT (Bracket Notation)
 print("Review Text:", result['review_text'])
-print("Sentiment:", result['sentiment'])
+# print("Sentiment:", result['sentiment'])
 print("Key Themes:", result['key_themes'])
-print("Pros:", result['pros'])
-print("Cons:", result['cons'])    
+print("Pros:", result['props'])
+print("Cons:", result['cons'])
 
-
-# We cant have data validation in typeddict because typeddict is just a type hinting construct and does not enforce any runtime checks. For runtime data validation, we would typically use libraries like Pydantic  which provide robust validation mechanisms. TypedDicts are primarily used for static type checking during development to ensure that dictionaries conform to a specified structure.
