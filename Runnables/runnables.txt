@@ -1,0 +1,5 @@
+there are 2 types of runnable
+
+Task specific templates - corelangchain compontn
+ruunable primitive- runnables that connect tasl specific runnable
+
