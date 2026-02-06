@@ -1,0 +1,12 @@
+What is RAG
+
+RAG combines information retrival wit lang gen where model retrived relevant document from a knwlege base and then use them as context to gemerate acc and grounded information
+
+benifits
+privacy,no document limit
+
+Componets of RAG
+Document loader,text splitters,vector db and retrievers
+
+Document loader- textloader,pypdf loader,web based loader,CSV loader
+ 
