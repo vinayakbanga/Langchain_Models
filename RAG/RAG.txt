@@ -9,4 +9,5 @@ Componets of RAG
 Document loader,text splitters,vector db and retrievers
 
 Document loader- textloader,pypdf loader,web based loader,CSV loader
- 
+
+Text splitter- Length based,text structure based,doc structure based,semantic based
