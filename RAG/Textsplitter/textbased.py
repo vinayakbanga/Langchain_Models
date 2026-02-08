@@ -16,6 +16,6 @@ I have also created a folder named Textsplitter where I am creating different ty
 
 spliter=RecursiveCharacterTextSplitter(chunk_size=300,chunk_overlap=0)
 
-chunks=spliter.split_text(text)
+chunks=spliter.split_text(text) 
 print(len(chunks))
 print(chunks)
